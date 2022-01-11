@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_task_app/login.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_task_app/UserInfo/info.dart';
+import 'package:flutter_task_app/UserInfo/user.dart';
+import 'package:flutter_task_app/signup+login/login.dart';
+import 'package:flutter_task_app/signup+login/signup.dart';
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await getData();
   runApp(const MyApp());
 }
 
@@ -15,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const SignUpPage(),
+      home: User.name == null ? const SignUpPage() : const UserInfo(),
     );
   }
 }
