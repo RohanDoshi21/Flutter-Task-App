@@ -9,3 +9,6 @@ A Flutter project where I am going to integrate the rest apis created using Node
 # Sign-Up & Login Pages
 <img src= "https://user-images.githubusercontent.com/63660267/148986632-a4f02df7-7472-4055-9a8b-163e6803e73f.png" width=275 height=575></img>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 <img src= "https://user-images.githubusercontent.com/63660267/148986913-b55edab3-12d4-4cdd-b0ea-918478adaba3.png" width=275 height=575></img>
+
+# Home Screen 
+<img src= "https://user-images.githubusercontent.com/63660267/149386491-9797c96a-3d1b-4917-a9c2-39464d027e09.png" width=275 height=575>
