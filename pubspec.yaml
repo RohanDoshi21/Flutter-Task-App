@@ -37,6 +37,7 @@ dependencies:
   http: ^0.13.4
   flutter_secure_storage: ^5.0.2
   fluttertoast: ^8.0.8
+  awesome_dialog: ^2.1.2
 
 dev_dependencies:
   flutter_test:

@@ -6,7 +6,6 @@ import 'package:flutter_task_app/Urls/urls.dart';
 import 'package:flutter_task_app/UserInfo/info.dart';
 import 'package:flutter_task_app/UserInfo/user.dart';
 import 'package:flutter_task_app/home/home.dart';
-import 'package:flutter_task_app/home/test.dart';
 import 'package:flutter_task_app/signup+login/login.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
