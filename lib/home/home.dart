@@ -131,11 +131,63 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               title: 'Update Task',
               desc: 'Select the follow to proceed or back button to cancel',
               btnCancelText: "Delete",
-              btnCancelOnPress: () {
-                getTasks();
+              btnCancelOnPress: () async {
+                Map<String, String> header = {
+                  "Authorization": "Bearer ${User.token}"
+                };
+                try {
+                  final response = await http
+                      .delete(Uri.parse(deleteTask + task.id), headers: header);
+                  if (response.statusCode == 200) {
+                    taskList.remove(task);
+                    setState(() {
+                      load = false;
+                    });
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: 'Task not deleted try again later',
+                      backgroundColor: Colors.red.shade600,
+                    );
+                  }
+                } catch (e) {
+                  Fluttertoast.showToast(
+                    msg: 'Please try again later',
+                    backgroundColor: Colors.red.shade600,
+                  );
+                }
               },
               btnOkText: task.completed ? "Mark Pending" : "Mark Complete",
-              btnOkOnPress: () {},
+              btnOkOnPress: () async {
+                Map<String, String> header = {
+                  "Authorization": "Bearer ${User.token}",
+                  "Content-Type": "application/json"
+                };
+                try {
+                  Map data = {
+                    "completed": !task.completed,
+                  };
+                  final response = await http.patch(
+                      Uri.parse(updateTask + task.id),
+                      headers: header,
+                      body: jsonEncode(data));
+                  if (response.statusCode == 200) {
+                    task.completed = !task.completed;
+                    setState(() {
+                      load = false;
+                    });
+                  } else {
+                    Fluttertoast.showToast(
+                      msg: 'Task not updated try again later',
+                      backgroundColor: Colors.red.shade600,
+                    );
+                  }
+                } catch (e) {
+                  Fluttertoast.showToast(
+                    msg: 'Please try again later',
+                    backgroundColor: Colors.red.shade600,
+                  );
+                }
+              },
               dismissOnTouchOutside: true,
             ).show();
           },
