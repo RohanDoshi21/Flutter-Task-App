@@ -80,6 +80,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
+                  actions: [
+                    IconButton(
+                        onPressed: () {
+                          showDialogWithFields();
+                        },
+                        icon: const Icon(Icons.add))
+                  ],
                 ),
               ),
             ),
@@ -102,7 +109,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               parent: AlwaysScrollableScrollPhysics()),
                           itemCount: taskList.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return card(taskList[index]);
+                            return card(taskList[taskList.length - index - 1]);
                           }),
                     ),
                   ],
@@ -250,5 +257,103 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  void showDialogWithFields() {
+    final TextEditingController _desc = TextEditingController();
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          Size size = MediaQuery.of(context).size;
+          return AlertDialog(
+            backgroundColor: Colors.white.withOpacity(.85),
+            scrollable: true,
+            title: Text(
+              'New Task',
+              style: TextStyle(color: Colors.black.withOpacity(.9)),
+            ),
+            content: Container(
+              // height: size.height * 0.08,
+              width: size.width,
+              alignment: Alignment.center,
+              padding: EdgeInsets.only(right: size.width / 30),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: TextField(
+                  controller: _desc,
+                  style: TextStyle(
+                    color: Colors.black.withOpacity(.9),
+                  ),
+                  minLines: 1,
+                  maxLines: 8,
+                  // allow user to enter 5 line in textfield
+                  keyboardType: TextInputType.multiline,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: "description",
+                    hintStyle: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black.withOpacity(.5),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(12.0))),
+            actions: [
+              InkWell(
+                child: Container(
+                  height: size.height * 0.04,
+                  width: size.width * 0.15,
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "Add",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.green, fontSize: 20),
+                    ),
+                  ),
+                ),
+                onTap: () async {
+                  Map<String, String> header = {
+                    "Authorization": "Bearer ${User.token}",
+                    "Content-Type": "application/json"
+                  };
+                  try {
+                    Map data = {
+                      "description": _desc.text.trim(),
+                    };
+                    final response = await http.post(Uri.parse(createTask),
+                        headers: header, body: jsonEncode(data));
+                    if (response.statusCode == 201) {
+                      var data = jsonDecode(response.body);
+                      taskList.add(Task.fromJson(data));
+                      setState(() {});
+                    } else {
+                      Fluttertoast.showToast(
+                        msg: 'Task not created try again later',
+                        backgroundColor: Colors.red.shade600,
+                      );
+                    }
+                  } catch (e) {
+                    Fluttertoast.showToast(
+                      msg: 'Please try again later',
+                      backgroundColor: Colors.red.shade600,
+                    );
+                  }
+                  Navigator.pop(context);
+                },
+              )
+            ],
+          );
+        });
   }
 }

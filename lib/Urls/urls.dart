@@ -4,3 +4,4 @@ const createUserUrl = baseUrl + "/users";
 const getTasksUrl = baseUrl + "/tasks";
 const deleteTask = baseUrl + "/tasks/";
 const updateTask = baseUrl + '/tasks/';
+const createTask = baseUrl + "/tasks";
