@@ -11,4 +11,5 @@ A Flutter project where I am going to integrate the rest apis created using Node
 <img src= "https://user-images.githubusercontent.com/63660267/148986913-b55edab3-12d4-4cdd-b0ea-918478adaba3.png" width=275 height=575></img>
 
 # Home Screen 
-<img src= "https://user-images.githubusercontent.com/63660267/149386491-9797c96a-3d1b-4917-a9c2-39464d027e09.png" width=275 height=575>
+<img src= "https://user-images.githubusercontent.com/63660267/149386491-9797c96a-3d1b-4917-a9c2-39464d027e09.png" width=275 height=575> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+<img src= "https://user-images.githubusercontent.com/63660267/149628704-65de9c35-c202-4ad2-a3aa-c7dc9076ed9a.png" width=275 height=575></img>
