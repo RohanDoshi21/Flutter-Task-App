@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<Task> taskList = [];
   bool load = true;
+
+  bool _bool = true;
 
   Future getTasks() async {
     // print("${User.token}");
@@ -87,10 +90,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         },
                         icon: const Icon(Icons.add))
                   ],
+                  leading: IconButton(
+                    icon: Icon(Icons.menu_rounded),
+                    splashColor: Colors.transparent,
+                    onPressed: () {
+                      setState(() {
+                        _bool = false;
+                      });
+                    },
+                  ),
                 ),
               ),
             ),
-            drawer: const Drawer(),
+            // drawer: const Drawer(),
             body: Stack(
               children: [
                 Container(
@@ -114,6 +126,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
+                CustomNavigationDrawer(),
               ],
             ),
           );
@@ -355,5 +368,130 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ],
           );
         });
+  }
+
+  Widget CustomNavigationDrawer() {
+    double _height = MediaQuery.of(context).size.height;
+    double _width = MediaQuery.of(context).size.width;
+    return WillPopScope(
+      onWillPop: () async {
+        setState(() {
+          _bool = true;
+        });
+        return false;
+      },
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: _bool ? 0 : 10.0, sigmaY: _bool ? 0 : 10.0),
+        child: Container(
+          height: _bool ? 0 : _height,
+          width: _bool ? 0 : _width,
+          color: Colors.transparent,
+          child: Center(
+            child: Container(
+              width: _width * .8,
+              height: _height * .45,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.6),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Column(
+                  // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    SizedBox(
+                      height: _height * 0.015,
+                    ),
+                    const CircleAvatar(
+                      backgroundColor: Colors.black12,
+                      radius: 45,
+                      child: Icon(
+                        Icons.person_outline_rounded,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(
+                      height: _height * 0.015,
+                    ),
+                    Flexible(
+                      child: Text(
+                        User.name.toString(),
+                        style: const TextStyle(fontSize: 30),
+                      ),
+                    ),
+                    SizedBox(
+                      height: _height * 0.007,
+                    ),
+                    Flexible(
+                      child: Text(
+                        User.email.toString(),
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                    ),
+                    SizedBox(
+                      height: _height * 0.025,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        InkWell(
+                          child: Container(
+                            height: _height * 0.04,
+                            width: _width * 0.25,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Delete",
+                                textAlign: TextAlign.center,
+                                style:
+                                    TextStyle(color: Colors.red, fontSize: 20),
+                              ),
+                            ),
+                          ),
+                          onTap: () async {},
+                        ),
+                        InkWell(
+                          child: Container(
+                            height: _height * 0.04,
+                            width: _width * 0.25,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(.1),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Logout",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.red[400], fontSize: 20),
+                              ),
+                            ),
+                          ),
+                          onTap: () async {},
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: _height * 0.055,
+                    ),
+                    const Text(
+                      "This app is made by Rohan Doshi",
+                      style: TextStyle(fontSize: 19),
+                    ),
+                    SizedBox(
+                      height: _height * 0.015,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
