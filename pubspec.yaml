@@ -39,7 +39,8 @@ dependencies:
   fluttertoast: ^8.0.8
   awesome_dialog: ^2.1.2
   cached_network_image: ^3.2.0
-  image_picker: ^0.8.4+4
+  file_picker: ^4.3.2
+  flutter_cache_manager: ^3.3.0
 
 dev_dependencies:
   flutter_test:

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_task_app/Urls/urls.dart';
@@ -12,8 +12,6 @@ import 'package:flutter_task_app/signup+login/signup.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
-import 'package:flutter_task_app/UserInfo/info.dart';
-import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -23,6 +21,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  List<PlatformFile>? _files;
+
   List<Task> taskList = [];
   bool load = true;
 
@@ -120,13 +120,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   children: [
                     SizedBox(height: _w / 40.1),
                     Expanded(
-                      child: ListView.builder(
-                          physics: const BouncingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics()),
-                          itemCount: taskList.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return card(taskList[taskList.length - index - 1]);
-                          }),
+                      child: taskList.isEmpty
+                          ? const Center(
+                              child: Text(
+                                "Click on the plus (+) button to add tasks!",
+                                style: TextStyle(
+                                    fontSize: 18, color: Colors.white),
+                              ),
+                            )
+                          : ListView.builder(
+                              physics: const BouncingScrollPhysics(
+                                  parent: AlwaysScrollableScrollPhysics()),
+                              itemCount: taskList.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return card(
+                                    taskList[taskList.length - index - 1]);
+                              }),
                     ),
                   ],
                 ),
@@ -409,16 +418,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     ),
                     GestureDetector(
                       onTap: () async {
-                        final ImagePicker _picker = ImagePicker();
-                        // Pick an image
-                        final XFile? image = await _picker.pickImage(
-                            source: ImageSource.gallery);
+                        _uploadFile();
                       },
                       child: CircleAvatar(
-                        backgroundImage: CachedNetworkImageProvider(
+                        backgroundImage: NetworkImage(
                             'https://rohandoshi21-task-app.herokuapp.com/users/${User.id}/avatar'),
                         backgroundColor: Colors.black12,
                         radius: 45,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.black12,
+                                radius: 20,
+                                child: IconButton(
+                                  onPressed: () {
+                                    _uploadFile();
+                                  },
+                                  icon: const Icon(
+                                    Icons.add_a_photo_rounded,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(
@@ -496,7 +522,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                       Navigator.pushAndRemoveUntil(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (BuildContext context) => const SignUpPage(),
+                                            builder: (BuildContext context) =>
+                                                const SignUpPage(),
                                           ),
                                           ModalRoute.withName('/'));
                                     } else {
@@ -566,7 +593,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                                   Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (BuildContext context) => const SignUpPage(),
+                                        builder: (BuildContext context) =>
+                                            const SignUpPage(),
                                       ),
                                       ModalRoute.withName('/'));
                                 } catch (e) {
@@ -600,5 +628,50 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  void _openFileExplorer() async {
+    _files = (await FilePicker.platform.pickFiles(
+            type: FileType.custom,
+            allowMultiple: false,
+            allowedExtensions: ['jpg', 'png', 'jpeg']))!
+        .files;
+  }
+
+  void _uploadFile() async {
+    _openFileExplorer();
+    if (_files != null) {
+      Map<String, String> header = {
+        "Authorization": "Bearer ${User.token}",
+        "Content-Type": "application/json"
+      };
+
+      // File file = File(image.path);
+
+      var uri = Uri.parse(uploadAvatarUrl);
+      var request = http.MultipartRequest('POST', uri);
+      request.files.add(await http.MultipartFile.fromPath(
+          'avatar', _files!.first.path.toString()));
+      request.headers.addAll(header);
+      var response = await request.send();
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: 'Avatar upload Success',
+          backgroundColor: Colors.blue.shade600,
+        );
+        setState(() {
+          _bool = true;
+        });
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Failed to upload',
+          backgroundColor: Colors.red.shade600,
+        );
+        setState(() {
+          _bool = true;
+        });
+      }
+    }
+    _files = null;
   }
 }

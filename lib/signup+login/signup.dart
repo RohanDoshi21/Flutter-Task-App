@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_task_app/Urls/urls.dart';
-import 'package:flutter_task_app/UserInfo/info.dart';
 import 'package:flutter_task_app/UserInfo/user.dart';
 import 'package:flutter_task_app/home/home.dart';
 import 'package:flutter_task_app/signup+login/login.dart';

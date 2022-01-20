@@ -7,3 +7,4 @@ const updateTask = baseUrl + '/tasks/';
 const createTask = baseUrl + "/tasks";
 const logoutUrl = baseUrl + "/logout";
 const deleteUserUrl = baseUrl + "/users/me";
+const uploadAvatarUrl = baseUrl + "/users/me/avatar";
