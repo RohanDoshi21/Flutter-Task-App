@@ -645,7 +645,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         "Authorization": "Bearer ${User.token}",
         "Content-Type": "application/json"
       };
-
+      Fluttertoast.showToast(
+        msg: 'Uploading...',
+        backgroundColor: Colors.blue.shade600,
+      );
       // File file = File(image.path);
 
       var uri = Uri.parse(uploadAvatarUrl);
