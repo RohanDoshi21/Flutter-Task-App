@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_task_app/Urls/urls.dart';
 import 'package:flutter_task_app/UserInfo/info.dart';
 import 'package:flutter_task_app/UserInfo/user.dart';
+import 'package:flutter_task_app/home/home.dart';
 import 'package:flutter_task_app/signup+login/signup.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -65,6 +66,7 @@ class _LoginPageState extends State<LoginPage> {
         await storage.write(key: 'token', value: result['token']);
         await storage.write(key: 'email', value: _email.text.trim());
         await storage.write(key: 'name', value: result['user']['name']);
+        await storage.write(key: 'id', value: result['user']['_id']);
         await getData();
         // print(result['user']['name']);
         setState(() {
@@ -76,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const UserInfo()),
+          MaterialPageRoute(builder: (context) => const HomePage()),
         );
       } else {
         setState(() {

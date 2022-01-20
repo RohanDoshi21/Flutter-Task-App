@@ -79,6 +79,7 @@ class _SignUpPageState extends State<SignUpPage> {
         await storage.write(key: 'token', value: result['token']);
         await storage.write(key: 'name', value: _name.text.trim());
         await storage.write(key: 'email', value: _email.text.trim());
+        await storage.write(key: 'id', value: result['user']['_id']);
         await getData();
         setState(() {
           load = false;

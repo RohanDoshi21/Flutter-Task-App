@@ -2,14 +2,18 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_task_app/Urls/urls.dart';
 import 'package:flutter_task_app/UserInfo/task.dart';
 import 'package:flutter_task_app/UserInfo/user.dart';
+import 'package:flutter_task_app/signup+login/signup.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:flutter_task_app/UserInfo/info.dart';
+import 'package:image_picker/image_picker.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -381,7 +385,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return false;
       },
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: _bool ? 0 : 10.0, sigmaY: _bool ? 0 : 10.0),
+        filter: ImageFilter.blur(
+            sigmaX: _bool ? 0 : 10.0, sigmaY: _bool ? 0 : 10.0),
         child: Container(
           height: _bool ? 0 : _height,
           width: _bool ? 0 : _width,
@@ -402,13 +407,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     SizedBox(
                       height: _height * 0.015,
                     ),
-                    const CircleAvatar(
-                      backgroundColor: Colors.black12,
-                      radius: 45,
-                      child: Icon(
-                        Icons.person_outline_rounded,
-                        size: 40,
-                        color: Colors.white,
+                    GestureDetector(
+                      onTap: () async {
+                        final ImagePicker _picker = ImagePicker();
+                        // Pick an image
+                        final XFile? image = await _picker.pickImage(
+                            source: ImageSource.gallery);
+                      },
+                      child: CircleAvatar(
+                        backgroundImage: CachedNetworkImageProvider(
+                            'https://rohandoshi21-task-app.herokuapp.com/users/${User.id}/avatar'),
+                        backgroundColor: Colors.black12,
+                        radius: 45,
                       ),
                     ),
                     SizedBox(
@@ -436,24 +446,75 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         InkWell(
-                          child: Container(
-                            height: _height * 0.04,
-                            width: _width * 0.25,
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(.1),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "Delete",
-                                textAlign: TextAlign.center,
-                                style:
-                                    TextStyle(color: Colors.red, fontSize: 20),
+                            child: Container(
+                              height: _height * 0.04,
+                              width: _width * 0.25,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(.1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Delete",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 20),
+                                ),
                               ),
                             ),
-                          ),
-                          onTap: () async {},
-                        ),
+                            onTap: () async {
+                              AwesomeDialog(
+                                context: context,
+                                dialogType: DialogType.WARNING,
+                                animType: AnimType.BOTTOMSLIDE,
+                                headerAnimationLoop: false,
+                                title: 'Delete Account',
+                                desc:
+                                    'Are you sure, you want to delete the account? Note this cannot be undone!',
+                                btnCancelText: "No",
+                                btnCancelOnPress: () {
+                                  Navigator.pop(context);
+                                },
+                                btnOkText: "Yes",
+                                btnOkOnPress: () async {
+                                  Map<String, String> header = {
+                                    "Authorization": "Bearer ${User.token}",
+                                    "Content-Type": "application/json"
+                                  };
+                                  try {
+                                    final response = await http.delete(
+                                        Uri.parse(deleteUserUrl),
+                                        headers: header);
+
+                                    if (response.statusCode == 200) {
+                                      const storage = FlutterSecureStorage();
+                                      await storage.deleteAll();
+
+                                      // while (Navigator.canPop(context)) {
+                                      //   Navigator.pop(context);
+                                      // }
+                                      Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (BuildContext context) => const SignUpPage(),
+                                          ),
+                                          ModalRoute.withName('/'));
+                                    } else {
+                                      Fluttertoast.showToast(
+                                        msg: 'Error while deleting the user!',
+                                        backgroundColor: Colors.red.shade600,
+                                      );
+                                    }
+                                  } catch (e) {
+                                    Fluttertoast.showToast(
+                                      msg: 'Please try again later',
+                                      backgroundColor: Colors.red.shade600,
+                                    );
+                                  }
+                                },
+                                dismissOnTouchOutside: true,
+                              ).show();
+                            }),
                         InkWell(
                           child: Container(
                             height: _height * 0.04,
@@ -471,7 +532,53 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          onTap: () async {},
+                          onTap: () async {
+                            AwesomeDialog(
+                              context: context,
+                              dialogType: DialogType.WARNING,
+                              animType: AnimType.BOTTOMSLIDE,
+                              headerAnimationLoop: false,
+                              title: 'Logout?',
+                              desc: 'DO you really want to logout?',
+                              btnCancelText: "No",
+                              btnCancelOnPress: () {
+                                Navigator.pop(context);
+                              },
+                              btnOkText: "Yes",
+                              btnOkOnPress: () async {
+                                Map<String, String> header = {
+                                  "Authorization": "Bearer ${User.token}",
+                                  "Content-Type": "application/json"
+                                };
+                                try {
+                                  final response = await http.patch(
+                                      Uri.parse(logoutUrl),
+                                      headers: header);
+
+                                  const storage = FlutterSecureStorage();
+                                  await storage.deleteAll();
+
+                                  // while (Navigator.canPop(context)) {
+                                  //   Navigator.pop(context);
+                                  // }
+                                  // Navigator.pushNamedAndRemoveUntil(
+                                  //     context, '/', (_) => false);
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) => const SignUpPage(),
+                                      ),
+                                      ModalRoute.withName('/'));
+                                } catch (e) {
+                                  Fluttertoast.showToast(
+                                    msg: 'Please try again later',
+                                    backgroundColor: Colors.red.shade600,
+                                  );
+                                }
+                              },
+                              dismissOnTouchOutside: true,
+                            ).show();
+                          },
                         ),
                       ],
                     ),
